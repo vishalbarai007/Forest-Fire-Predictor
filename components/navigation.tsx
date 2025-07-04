@@ -2,9 +2,11 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Home, Map, Upload, Box, Brain, BarChart3, Download, Info, Moon, Sun } from "lucide-react"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Home, Map, Upload, Box, Brain, BarChart3, Download, Info, Moon, Sun, Menu } from "lucide-react"
 import { useTheme } from "next-themes"
 
 const navigation = [
@@ -21,9 +23,14 @@ const navigation = [
 export function Navigation() {
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
+  const [isOpen, setIsOpen] = useState(false)
+
+  const toggleTheme = () => {
+    setTheme(theme === "light" ? "dark" : "light")
+  }
 
   return (
-    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center space-x-8">
@@ -34,7 +41,8 @@ export function Navigation() {
               <span className="font-bold text-xl">FirePredict</span>
             </Link>
 
-            <div className="hidden md:flex items-center space-x-1">
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center space-x-1">
               {navigation.map((item) => {
                 const Icon = item.icon
                 return (
@@ -56,11 +64,54 @@ export function Navigation() {
             </div>
           </div>
 
-          <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
-            <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            <span className="sr-only">Toggle theme</span>
-          </Button>
+          <div className="flex items-center space-x-2">
+            {/* Theme Toggle */}
+            <Button variant="ghost" size="icon" onClick={toggleTheme}>
+              <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+
+            {/* Mobile Menu */}
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="lg:hidden">
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Toggle menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                <div className="flex flex-col space-y-4 mt-6">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+                      <span className="text-white font-bold text-sm">🔥</span>
+                    </div>
+                    <span className="font-bold text-xl">FirePredict</span>
+                  </div>
+
+                  {navigation.map((item) => {
+                    const Icon = item.icon
+                    return (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        onClick={() => setIsOpen(false)}
+                        className={cn(
+                          "flex items-center space-x-3 px-3 py-3 rounded-md text-sm font-medium transition-colors",
+                          pathname === item.href
+                            ? "bg-primary text-primary-foreground"
+                            : "text-muted-foreground hover:text-foreground hover:bg-accent",
+                        )}
+                      >
+                        <Icon className="h-5 w-5" />
+                        <span>{item.name}</span>
+                      </Link>
+                    )
+                  })}
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </div>
     </nav>

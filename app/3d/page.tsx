@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense, useRef, useState, useMemo } from "react"
+import { Suspense, useRef, useState, useMemo, useEffect } from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
 import { OrbitControls, Environment, Html } from "@react-three/drei"
 import { Navigation } from "@/components/navigation"
@@ -12,8 +12,59 @@ import { Badge } from "@/components/ui/badge"
 import { Play, Pause, RotateCcw, Camera, Maximize, Settings } from "lucide-react"
 import type * as THREE from "three"
 
+// 3D Forest Component
+function Forest({ fireIntensity }: { fireIntensity: number }) {
+  const groupRef = useRef<THREE.Group>(null)
+
+  const trees = useMemo(() => {
+    const treePositions = []
+    for (let i = 0; i < 50; i++) {
+      treePositions.push({
+        x: (Math.random() - 0.5) * 18,
+        z: (Math.random() - 0.5) * 18,
+        height: 1 + Math.random() * 2,
+        burning: Math.random() < fireIntensity * 0.3,
+      })
+    }
+    return treePositions
+  }, [])
+
+  useFrame((state) => {
+    if (groupRef.current) {
+      groupRef.current.children.forEach((tree, index) => {
+        if (trees[index]?.burning) {
+          tree.rotation.z = Math.sin(state.clock.elapsedTime * 2 + index) * 0.1
+        }
+      })
+    }
+  })
+
+  return (
+    <group ref={groupRef}>
+      {trees.map((tree, index) => (
+        <group key={index} position={[tree.x, -2 + tree.height / 2, tree.z]}>
+          {/* Tree trunk */}
+          <mesh position={[0, -tree.height / 2, 0]}>
+            <cylinderGeometry args={[0.1, 0.15, tree.height * 0.6]} />
+            <meshStandardMaterial color="#8B4513" />
+          </mesh>
+          {/* Tree foliage */}
+          <mesh position={[0, tree.height * 0.2, 0]}>
+            <coneGeometry args={[0.5, tree.height * 0.8]} />
+            <meshStandardMaterial
+              color={tree.burning ? "#ff4500" : "#228B22"}
+              emissive={tree.burning ? "#ff2200" : "#000000"}
+              emissiveIntensity={tree.burning ? 0.3 : 0}
+            />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  )
+}
+
 // 3D Terrain Component
-function Terrain({ fireIntensity = 0 }: { fireIntensity?: number }) {
+function Terrain({ fireIntensity = 0, wireframe = false }: { fireIntensity?: number; wireframe?: boolean }) {
   const meshRef = useRef<THREE.Mesh>(null)
 
   useFrame((state) => {
@@ -25,7 +76,7 @@ function Terrain({ fireIntensity = 0 }: { fireIntensity?: number }) {
   return (
     <mesh ref={meshRef} position={[0, -2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
       <planeGeometry args={[20, 20, 50, 50]} />
-      <meshStandardMaterial color="#4a5d23" wireframe={false} roughness={0.8} metalness={0.1} />
+      <meshStandardMaterial color="#4a5d23" wireframe={wireframe} roughness={0.8} metalness={0.1} />
     </mesh>
   )
 }
@@ -33,16 +84,15 @@ function Terrain({ fireIntensity = 0 }: { fireIntensity?: number }) {
 // Fire Particles Component
 function FireParticles({ intensity = 0.5, visible = true }: { intensity?: number; visible?: boolean }) {
   const pointsRef = useRef<THREE.Points>(null)
-  const maxParticles = 1000 // Fixed maximum number of particles
+  const maxParticles = 1000
   const activeParticles = Math.floor(intensity * maxParticles)
 
-  // Create fixed-size arrays for maximum particles
   const positions = useMemo(() => {
     const pos = new Float32Array(maxParticles * 3)
     for (let i = 0; i < maxParticles; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 10 // x
-      pos[i * 3 + 1] = Math.random() * 5 // y
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 10 // z
+      pos[i * 3] = (Math.random() - 0.5) * 10
+      pos[i * 3 + 1] = Math.random() * 5
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 10
     }
     return pos
   }, [])
@@ -50,9 +100,9 @@ function FireParticles({ intensity = 0.5, visible = true }: { intensity?: number
   const colors = useMemo(() => {
     const col = new Float32Array(maxParticles * 3)
     for (let i = 0; i < maxParticles; i++) {
-      col[i * 3] = 1 // Red
-      col[i * 3 + 1] = Math.random() * 0.5 // Green
-      col[i * 3 + 2] = 0 // Blue
+      col[i * 3] = 1
+      col[i * 3 + 1] = Math.random() * 0.5
+      col[i * 3 + 2] = 0
     }
     return col
   }, [])
@@ -72,19 +122,16 @@ function FireParticles({ intensity = 0.5, visible = true }: { intensity?: number
       const positionAttribute = pointsRef.current.geometry.attributes.position
       const opacityAttribute = pointsRef.current.geometry.attributes.opacity
 
-      // Update positions for active particles only
       for (let i = 0; i < activeParticles; i++) {
         const index = i * 3
-        positions[index + 1] += 0.01 // Move particles up
+        positions[index + 1] += 0.02 * (1 + intensity)
         if (positions[index + 1] > 5) {
-          positions[index + 1] = 0 // Reset to ground level
-          // Randomize x and z position when resetting
+          positions[index + 1] = 0
           positions[index] = (Math.random() - 0.5) * 10
           positions[index + 2] = (Math.random() - 0.5) * 10
         }
       }
 
-      // Update opacity based on intensity
       for (let i = 0; i < maxParticles; i++) {
         opacities[i] = i < activeParticles ? 0.5 + Math.random() * 0.5 : 0.0
       }
@@ -103,25 +150,40 @@ function FireParticles({ intensity = 0.5, visible = true }: { intensity?: number
         <bufferAttribute attach="attributes-color" count={maxParticles} array={colors} itemSize={3} />
         <bufferAttribute attach="attributes-opacity" count={maxParticles} array={opacities} itemSize={1} />
       </bufferGeometry>
-      <pointsMaterial size={0.1} vertexColors transparent opacity={0.8} alphaTest={0.1} />
+      <pointsMaterial size={0.15} vertexColors transparent opacity={0.8} alphaTest={0.1} />
     </points>
   )
 }
 
 // 3D Scene Component
-function Scene3D({ fireIntensity, showFire }: { fireIntensity: number; showFire: boolean }) {
+function Scene3D({
+  fireIntensity,
+  showFire,
+  wireframe,
+  showGrid,
+  ambientLighting,
+}: {
+  fireIntensity: number
+  showFire: boolean
+  wireframe: boolean
+  showGrid: boolean
+  ambientLighting: boolean
+}) {
   return (
     <>
-      <ambientLight intensity={0.4} />
+      {ambientLighting && <ambientLight intensity={0.4} />}
       <directionalLight position={[10, 10, 5]} intensity={1} />
-      <pointLight position={[0, 5, 0]} intensity={0.5} color="#ff4500" />
+      <pointLight position={[0, 5, 0]} intensity={fireIntensity * 2} color="#ff4500" />
 
-      <Terrain fireIntensity={fireIntensity} />
+      {showGrid && <gridHelper args={[20, 20, "#666666", "#444444"]} position={[0, -1.9, 0]} />}
+
+      <Terrain fireIntensity={fireIntensity} wireframe={wireframe} />
+      <Forest fireIntensity={fireIntensity} />
       <FireParticles intensity={fireIntensity} visible={showFire} />
 
       <Html position={[0, 3, 0]} center>
         <div className="bg-black/50 text-white px-3 py-1 rounded text-sm">
-          Fire Intensity: {Math.round(fireIntensity * 100)}%
+          Fire Intensity: {Math.round(fireIntensity * 100)}% | Trees Burning: {Math.round(fireIntensity * 15)}
         </div>
       </Html>
     </>
@@ -132,7 +194,24 @@ export default function Visualization3DPage() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [fireIntensity, setFireIntensity] = useState([0.3])
   const [showFire, setShowFire] = useState(true)
+  const [wireframe, setWireframe] = useState(false)
+  const [showGrid, setShowGrid] = useState(true)
+  const [ambientLighting, setAmbientLighting] = useState(true)
   const [cameraMode, setCameraMode] = useState("orbit")
+
+  // Auto-play animation
+  useEffect(() => {
+    let interval: NodeJS.Timeout
+    if (isPlaying) {
+      interval = setInterval(() => {
+        setFireIntensity((prev) => {
+          const newValue = prev[0] + 0.01
+          return newValue >= 1 ? [0] : [newValue]
+        })
+      }, 100)
+    }
+    return () => clearInterval(interval)
+  }, [isPlaying])
 
   return (
     <div className="min-h-screen bg-background">
@@ -151,8 +230,8 @@ export default function Visualization3DPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle>3D Terrain Visualization</CardTitle>
-                    <CardDescription>Interactive 3D fire spread simulation</CardDescription>
+                    <CardTitle>3D Forest Fire Simulation</CardTitle>
+                    <CardDescription>Interactive 3D fire spread with forest terrain</CardDescription>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">
@@ -165,7 +244,13 @@ export default function Visualization3DPage() {
                 <div className="h-[600px] w-full bg-gradient-to-b from-sky-200 to-sky-100 rounded-lg overflow-hidden">
                   <Canvas camera={{ position: [10, 8, 10], fov: 60 }}>
                     <Suspense fallback={null}>
-                      <Scene3D fireIntensity={fireIntensity[0]} showFire={showFire} />
+                      <Scene3D
+                        fireIntensity={fireIntensity[0]}
+                        showFire={showFire}
+                        wireframe={wireframe}
+                        showGrid={showGrid}
+                        ambientLighting={ambientLighting}
+                      />
                       <OrbitControls
                         enablePan={true}
                         enableZoom={true}
@@ -275,15 +360,15 @@ export default function Visualization3DPage() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm">Wireframe Mode</span>
-                    <Switch />
+                    <Switch checked={wireframe} onCheckedChange={setWireframe} />
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm">Show Grid</span>
-                    <Switch defaultChecked />
+                    <Switch checked={showGrid} onCheckedChange={setShowGrid} />
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm">Ambient Lighting</span>
-                    <Switch defaultChecked />
+                    <Switch checked={ambientLighting} onCheckedChange={setAmbientLighting} />
                   </div>
                 </div>
 
@@ -301,20 +386,20 @@ export default function Visualization3DPage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Terrain Size</span>
+                  <span className="text-sm text-muted-foreground">Forest Area</span>
                   <span className="font-medium">20km²</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Particles</span>
+                  <span className="text-sm text-muted-foreground">Trees</span>
+                  <span className="font-medium">50</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Fire Particles</span>
                   <span className="font-medium">{Math.floor(fireIntensity[0] * 1000)}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Render Mode</span>
-                  <span className="font-medium">Real-time</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">FPS</span>
-                  <Badge variant="outline">60</Badge>
+                  <span className="text-sm text-muted-foreground">Burning Trees</span>
+                  <Badge variant="destructive">{Math.round(fireIntensity[0] * 15)}</Badge>
                 </div>
               </CardContent>
             </Card>
