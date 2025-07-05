@@ -34,8 +34,8 @@ export default function AboutPage() {
               <p className="text-muted-foreground leading-relaxed">
                 The platform integrates multiple data sources including satellite imagery, weather data, terrain
                 information, and vegetation indices to create comprehensive risk assessments. Our 3D visualization
-                capabilities and interactive mapping tools make complex fire behavior data accessible to researchers,
-                emergency responders, and land managers.
+                capabilities, 2D to 3D conversion tools, and interactive mapping make complex fire behavior data
+                accessible to researchers, emergency responders, and land managers.
               </p>
             </CardContent>
           </Card>
@@ -97,30 +97,38 @@ export default function AboutPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="text-center">
                   <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mx-auto mb-3 flex items-center justify-center text-white font-bold text-xl">
-                    JD
+                    VB
                   </div>
-                  <h4 className="font-medium">Dr. Jane Doe</h4>
+                  <h4 className="font-medium">Vishal Barai</h4>
                   <p className="text-sm text-muted-foreground">Project Lead & ML Engineer</p>
-                  <p className="text-xs text-muted-foreground mt-1">PhD in Computer Science</p>
+                  <p className="text-xs text-muted-foreground mt-1">AI/ML Specialist</p>
                 </div>
                 <div className="text-center">
                   <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-teal-600 rounded-full mx-auto mb-3 flex items-center justify-center text-white font-bold text-xl">
-                    JS
+                    AD
                   </div>
-                  <h4 className="font-medium">John Smith</h4>
-                  <p className="text-sm text-muted-foreground">GIS Specialist</p>
-                  <p className="text-xs text-muted-foreground mt-1">MS in Geographic Information Systems</p>
+                  <h4 className="font-medium">Ankit Dubey</h4>
+                  <p className="text-sm text-muted-foreground">GIS Specialist & Data Analyst</p>
+                  <p className="text-xs text-muted-foreground mt-1">Geospatial Technology Expert</p>
                 </div>
                 <div className="text-center">
                   <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-red-600 rounded-full mx-auto mb-3 flex items-center justify-center text-white font-bold text-xl">
-                    AB
+                    RV
                   </div>
-                  <h4 className="font-medium">Alice Brown</h4>
+                  <h4 className="font-medium">Raj Vishwakarma</h4>
                   <p className="text-sm text-muted-foreground">Frontend Developer</p>
-                  <p className="text-xs text-muted-foreground mt-1">BS in Software Engineering</p>
+                  <p className="text-xs text-muted-foreground mt-1">UI/UX & 3D Visualization</p>
+                </div>
+                <div className="text-center">
+                  <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full mx-auto mb-3 flex items-center justify-center text-white font-bold text-xl">
+                    SR
+                  </div>
+                  <h4 className="font-medium">Shekhar Rathod</h4>
+                  <p className="text-sm text-muted-foreground">Backend Developer</p>
+                  <p className="text-xs text-muted-foreground mt-1">System Architecture & APIs</p>
                 </div>
               </div>
             </CardContent>
@@ -156,7 +164,8 @@ export default function AboutPage() {
               <div className="pt-4 border-t">
                 <p className="text-sm text-muted-foreground">
                   We acknowledge the use of data from NASA, NOAA, USGS, and ESA. Special thanks to the open-source
-                  community for providing essential tools and libraries that made this project possible.
+                  community for providing essential tools and libraries that made this project possible. This project
+                  focuses on forest fire prediction and simulation for Uttarakhand, India region.
                 </p>
               </div>
             </CardContent>
@@ -183,6 +192,10 @@ export default function AboutPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Open Source Contribution</span>
                   <Badge variant="outline">GitHub</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">2D to 3D Innovation</span>
+                  <Badge variant="outline">Tech Innovation</Badge>
                 </div>
               </CardContent>
             </Card>

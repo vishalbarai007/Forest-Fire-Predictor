@@ -2,7 +2,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Navigation } from "@/components/navigation"
-import { Map, Upload, Brain, BarChart3, Box, Zap, Shield, Globe } from "lucide-react"
+import { Map, Upload, Brain, BarChart3, Box, Zap, Globe, Layers3 } from "lucide-react"
 
 export default function HomePage() {
   return (
@@ -17,8 +17,8 @@ export default function HomePage() {
           </h1>
           <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
             Advanced AI/ML-powered platform for simulating and modeling forest fire spread. Get next-day fire
-            probability maps, real-time spread animations, and custom predictions using cutting-edge U-Net, LSTM, and
-            Cellular Automata models.
+            probability maps, real-time spread animations, 2D to 3D terrain conversion, and custom predictions using
+            cutting-edge U-Net, LSTM, and Cellular Automata models.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
@@ -32,9 +32,9 @@ export default function HomePage() {
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <Link href="/upload">
-                <Upload className="mr-2 h-5 w-5" />
-                Upload Custom Data
+              <Link href="/2d-to-3d">
+                <Layers3 className="mr-2 h-5 w-5" />
+                Convert 2D to 3D
               </Link>
             </Button>
           </div>
@@ -51,7 +51,7 @@ export default function HomePage() {
               <CardTitle>Interactive Map Dashboard</CardTitle>
               <CardDescription>
                 Real-time fire probability maps with 30m resolution, historical data visualization, and animated fire
-                spread simulation
+                spread simulation for Uttarakhand region
               </CardDescription>
             </CardHeader>
           </Card>
@@ -62,6 +62,17 @@ export default function HomePage() {
               <CardTitle>Custom Data Upload</CardTitle>
               <CardDescription>
                 Upload GeoTIFF or GeoJSON files to get personalized fire risk predictions for your area of interest
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Card className="border-purple-200 hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <Layers3 className="h-10 w-10 text-purple-600 mb-2" />
+              <CardTitle>2D to 3D Conversion</CardTitle>
+              <CardDescription>
+                Revolutionary feature to convert 2D terrain maps into interactive 3D fire simulation models with
+                real-time rendering
               </CardDescription>
             </CardHeader>
           </Card>
@@ -82,7 +93,8 @@ export default function HomePage() {
               <Box className="h-10 w-10 text-green-600 mb-2" />
               <CardTitle>3D Visualization</CardTitle>
               <CardDescription>
-                Immersive 3D terrain rendering with animated fire spread overlays and interactive camera controls
+                Immersive 3D terrain rendering with animated fire spread overlays, forest ecosystems, and interactive
+                camera controls
               </CardDescription>
             </CardHeader>
           </Card>
@@ -93,16 +105,6 @@ export default function HomePage() {
               <CardTitle>Advanced Analytics</CardTitle>
               <CardDescription>
                 Comprehensive statistical analysis, risk zone mapping, and detailed performance metrics visualization
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card className="border-purple-200 hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <Shield className="h-10 w-10 text-purple-600 mb-2" />
-              <CardTitle>Risk Assessment</CardTitle>
-              <CardDescription>
-                Multi-factor risk analysis including terrain, weather, vegetation, and human activity data
               </CardDescription>
             </CardHeader>
           </Card>
@@ -126,9 +128,11 @@ export default function HomePage() {
             </p>
           </div>
           <div>
-            <Box className="h-12 w-12 text-green-600 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold mb-2">3D Visualization</h3>
-            <p className="text-muted-foreground">Three.js powered immersive 3D terrain and fire spread animation</p>
+            <Layers3 className="h-12 w-12 text-green-600 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2">3D Innovation</h3>
+            <p className="text-muted-foreground">
+              Three.js powered 3D terrain conversion and immersive fire simulation
+            </p>
           </div>
         </div>
       </section>
@@ -137,7 +141,8 @@ export default function HomePage() {
       <section className="container mx-auto px-4 py-16 text-center">
         <h2 className="text-3xl font-bold mb-6">Ready to Explore Fire Prediction?</h2>
         <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-          Start by exploring our interactive dashboard or upload your own data for custom predictions
+          Start by exploring our interactive dashboard, convert your 2D maps to 3D, or upload your own data for custom
+          predictions
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button
@@ -148,7 +153,7 @@ export default function HomePage() {
             <Link href="/dashboard">Start Exploring</Link>
           </Button>
           <Button asChild variant="outline" size="lg">
-            <Link href="/about">Learn More</Link>
+            <Link href="/2d-to-3d">Try 2D to 3D</Link>
           </Button>
         </div>
       </section>

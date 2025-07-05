@@ -6,13 +6,14 @@ import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Home, Map, Upload, Box, Brain, BarChart3, Download, Info, Moon, Sun, Menu } from "lucide-react"
+import { Home, Map, Upload, Box, Brain, BarChart3, Download, Info, Moon, Sun, Menu, Layers3 } from "lucide-react"
 import { useTheme } from "next-themes"
 
 const navigation = [
   { name: "Home", href: "/", icon: Home },
   { name: "Dashboard", href: "/dashboard", icon: Map },
   { name: "Upload & Predict", href: "/upload", icon: Upload },
+  { name: "2D to 3D Convert", href: "/2d-to-3d", icon: Layers3 },
   { name: "3D Visualization", href: "/3d", icon: Box },
   { name: "ML Insights", href: "/ml-insights", icon: Brain },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },

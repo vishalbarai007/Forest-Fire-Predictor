@@ -9,8 +9,103 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
-import { Play, Pause, RotateCcw, Camera, Maximize, Settings } from "lucide-react"
+import { Play, Pause, RotateCcw, Camera, Maximize, Settings, Smartphone } from "lucide-react"
 import type * as THREE from "three"
+
+// AR Viewer Component for 3D Visualization
+function ARViewer3D({ onClose }: { onClose: () => void }) {
+  const [isARSupported, setIsARSupported] = useState(false)
+  const [isARActive, setIsARActive] = useState(false)
+
+  useEffect(() => {
+    // Check if WebXR is supported
+    if (navigator.xr) {
+      navigator.xr.isSessionSupported("immersive-ar").then((supported) => {
+        setIsARSupported(supported)
+      })
+    }
+  }, [])
+
+  const startAR = async () => {
+    if (!navigator.xr || !isARSupported) {
+      alert("AR is not supported on this device. Please use a compatible mobile device with AR capabilities.")
+      return
+    }
+
+    try {
+      setIsARActive(true)
+      // In a real implementation, this would start the AR session
+      setTimeout(() => {
+        alert(
+          "AR session would start here. You would see the 3D forest fire simulation overlaid on your real environment.",
+        )
+        setIsARActive(false)
+      }, 2000)
+    } catch (error) {
+      console.error("Failed to start AR session:", error)
+      setIsARActive(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-md w-full mx-4">
+        <h3 className="text-lg font-semibold mb-4">AR Forest Fire Visualization</h3>
+
+        {!isARSupported ? (
+          <div className="space-y-4">
+            <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg">
+              <div className="flex items-center space-x-2 mb-2">
+                <Smartphone className="h-5 w-5 text-orange-600" />
+                <span className="font-medium text-orange-800 dark:text-orange-200">AR Not Available</span>
+              </div>
+              <p className="text-sm text-orange-700 dark:text-orange-300">
+                AR viewing requires a compatible mobile device with WebXR support.
+              </p>
+            </div>
+            <div className="text-sm text-muted-foreground space-y-2">
+              <p>
+                <strong>Supported devices:</strong>
+              </p>
+              <ul className="list-disc list-inside space-y-1">
+                <li>Android devices with ARCore</li>
+                <li>iOS devices with ARKit (iOS 12+)</li>
+                <li>Chrome or Safari browser</li>
+              </ul>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+              <p className="text-sm text-green-700 dark:text-green-300">
+                🎉 Your device supports AR! The 3D forest fire simulation will appear in your real environment.
+              </p>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Make sure you're in a well-lit area with enough space to move around safely.
+            </p>
+            <Button onClick={startAR} disabled={isARActive} className="w-full">
+              {isARActive ? (
+                <>Starting AR Session...</>
+              ) : (
+                <>
+                  <Smartphone className="mr-2 h-4 w-4" />
+                  Start AR Experience
+                </>
+              )}
+            </Button>
+          </div>
+        )}
+
+        <div className="flex space-x-2 mt-4">
+          <Button variant="outline" onClick={onClose} className="flex-1 bg-transparent">
+            Close
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 // 3D Forest Component
 function Forest({ fireIntensity }: { fireIntensity: number }) {
@@ -198,6 +293,7 @@ export default function Visualization3DPage() {
   const [showGrid, setShowGrid] = useState(true)
   const [ambientLighting, setAmbientLighting] = useState(true)
   const [cameraMode, setCameraMode] = useState("orbit")
+  const [showAR, setShowAR] = useState(false)
 
   // Auto-play animation
   useEffect(() => {
@@ -372,10 +468,16 @@ export default function Visualization3DPage() {
                   </div>
                 </div>
 
-                <Button variant="outline" size="sm" className="w-full bg-transparent">
-                  <Maximize className="mr-2 h-4 w-4" />
-                  Fullscreen
-                </Button>
+                <div className="space-y-2">
+                  <Button variant="outline" size="sm" className="w-full bg-transparent">
+                    <Maximize className="mr-2 h-4 w-4" />
+                    Fullscreen
+                  </Button>
+                  <Button variant="outline" size="sm" className="w-full bg-transparent" onClick={() => setShowAR(true)}>
+                    <Smartphone className="mr-2 h-4 w-4" />
+                    View in AR
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 
@@ -405,6 +507,9 @@ export default function Visualization3DPage() {
             </Card>
           </div>
         </div>
+
+        {/* AR Viewer Modal */}
+        {showAR && <ARViewer3D onClose={() => setShowAR(false)} />}
       </div>
     </div>
   )
