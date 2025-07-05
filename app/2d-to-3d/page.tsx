@@ -35,6 +35,7 @@ import {
 import { useToast } from "@/hooks/use-toast"
 import * as THREE from "three"
 
+
 // Fire Spread Map Component
 function FireSpreadMap({
   hour,
@@ -155,7 +156,6 @@ function Generated3DTerrain({
 
   useEffect(() => {
     if (heightmapData) {
-      // Create heightmap geometry from image data
       const newGeometry = new THREE.PlaneGeometry(10, 10, 63, 63)
       const vertices = newGeometry.attributes.position.array as Float32Array
 
@@ -184,8 +184,9 @@ function Generated3DTerrain({
 
   useFrame((state) => {
     if (meshRef.current && showFire) {
-      meshRef.current.material.emissive.setHex(0x331100)
-      meshRef.current.material.emissiveIntensity = 0.1 + Math.sin(state.clock.elapsedTime * 2) * 0.05
+      const material = meshRef.current.material as THREE.MeshStandardMaterial
+      material.emissive.setHex(0x331100)
+      material.emissiveIntensity = 0.1 + Math.sin(state.clock.elapsedTime * 2) * 0.05
     }
   })
 
@@ -263,8 +264,20 @@ function FireParticles3D({ visible = true }: { visible?: boolean }) {
   return (
     <points ref={pointsRef}>
       <bufferGeometry>
-        <bufferAttribute attach="attributes-position" count={particleCount} array={positions} itemSize={3} />
-        <bufferAttribute attach="attributes-color" count={particleCount} array={colors} itemSize={3} />
+        <bufferAttribute
+          attach="attributes-position"
+          args={[positions, 3]}
+          count={particleCount}
+          array={positions}
+          itemSize={3}
+        />
+        <bufferAttribute
+          attach="attributes-color"
+          args={[colors, 3]}
+          count={particleCount}
+          array={colors}
+          itemSize={3}
+        />
       </bufferGeometry>
       <pointsMaterial size={0.1} vertexColors transparent opacity={0.6} />
     </points>
@@ -383,7 +396,7 @@ export default function Map2Dto3DPage() {
       { x: 60, y: 30, intensity: 0.7, id: "fire-2" },
     ]
 
-    const spots = []
+    const spots: { intensity: number; x: number; y: number; id: string }[] = []
 
     // Add base fire spots with increasing intensity
     baseSpots.forEach((spot, index) => {

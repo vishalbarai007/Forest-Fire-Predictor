@@ -241,9 +241,9 @@ function FireParticles({ intensity = 0.5, visible = true }: { intensity?: number
   return (
     <points ref={pointsRef}>
       <bufferGeometry>
-        <bufferAttribute attach="attributes-position" count={maxParticles} array={positions} itemSize={3} />
-        <bufferAttribute attach="attributes-color" count={maxParticles} array={colors} itemSize={3} />
-        <bufferAttribute attach="attributes-opacity" count={maxParticles} array={opacities} itemSize={1} />
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} count={maxParticles} array={positions} itemSize={3} />
+        <bufferAttribute attach="attributes-color" args={[colors, 3]} count={maxParticles} array={colors} itemSize={3} />
+        <bufferAttribute attach="attributes-opacity" args={[opacities, 1]} count={maxParticles} array={opacities} itemSize={1} />
       </bufferGeometry>
       <pointsMaterial size={0.15} vertexColors transparent opacity={0.8} alphaTest={0.1} />
     </points>
