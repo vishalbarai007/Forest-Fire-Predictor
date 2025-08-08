@@ -9,7 +9,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <Navigation />
 
-      {/* Hero Section */}
+      {/* Hero Section for landing page */}
       <section className="container mx-auto px-4 py-16">
         <div className="text-center max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-6">
