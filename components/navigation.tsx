@@ -12,12 +12,13 @@ import { useTheme } from "next-themes"
 const navigation = [
   { name: "Home", href: "/", icon: Home },
   { name: "Dashboard", href: "/dashboard", icon: Map },
-  { name: "Upload & Predict", href: "/upload", icon: Upload },
-  { name: "2D to 3D Convert", href: "/2d-to-3d", icon: Layers3 },
-  { name: "3D Visualization", href: "/3d", icon: Box },
+  // { name: "Upload & Predict", href: "/upload", icon: Upload },
+  // { name: "2D to 3D Convert", href: "/2d-to-3d", icon: Layers3 },
+  // { name: "3D Visualization", href: "/3d", icon: Box },
+  { name: "Simulation", href: "/simulation", icon: Layers3 },
   { name: "ML Insights", href: "/ml-insights", icon: Brain },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
-  { name: "Download Report", href: "/report", icon: Download },
+  // { name: "Download Report", href: "/report", icon: Download },
   { name: "About", href: "/about", icon: Info },
 ]
 
