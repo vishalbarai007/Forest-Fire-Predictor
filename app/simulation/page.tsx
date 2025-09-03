@@ -146,7 +146,6 @@ function windAlignmentFactor(windSpeed: number, windDirDegTo: number, ndy: numbe
   const v = 1 + dot * mag // [0..2] approx
   return Math.min(3, Math.max(0.2, v))
 }
-
 function simulateCA(params: {
   fireProb: Grid // 0..1
   dem: Grid // 0..1 proxy
@@ -159,27 +158,17 @@ function simulateCA(params: {
   windDir: number // degrees TO
   humidity: number // %
   seed: number
-  ignitePoints?: Array<{ x: number; y: number }>
 }) {
-  const { fireProb, dem, fuel, w, h, nSteps, ignitionThreshold, windSpeed, windDir, humidity, seed, ignitePoints } =
-    params
+  const { fireProb, dem, fuel, w, h, nSteps, ignitionThreshold, windSpeed, windDir, humidity, seed } = params
 
   const rng = mulberry32(seed)
   const slope = computeSlope(dem, w, h)
   const state = new Uint8Array(w * h) // 0 unburnt, 1 burning, 2 burnt
 
-  // initialize burning where ML prob >= threshold
-  for (let i = 0; i < fireProb.length; i++) {
-    if (fireProb[i] >= ignitionThreshold) state[i] = 1
-  }
-  // optional user ignition points
-  if (ignitePoints && ignitePoints.length) {
-    ignitePoints.forEach((p) => {
-      if (p.x >= 0 && p.x < w && p.y >= 0 && p.y < h) {
-        state[idx(p.x, p.y, w)] = 1
-      }
-    })
-  }
+  // 🔥 Fire starts at center
+  const centerX = Math.floor(w / 2)
+  const centerY = Math.floor(h / 2)
+  state[idx(centerX, centerY, w)] = 1
 
   const frames: Array<Uint8Array> = [state.slice(0)]
   const hf = humidityFactor(humidity)
@@ -192,22 +181,31 @@ function simulateCA(params: {
     for (let n = 0; n < OFFS.length; n++) {
       const [dy, dx] = OFFS[n]
       const [ndy, ndx] = OFFS_UNIT[n]
-      const wf = windAlignmentFactor(windSpeed, windDir, ndy, ndx)
+
+      // 🌬️ Smooth wind bias (cosine-based curve instead of linear box)
+      const angle = Math.atan2(-ndy, ndx) * (180 / Math.PI) // neighbor direction
+      let diff = Math.abs(((angle - windDir + 540) % 360) - 180) // angular difference
+      const windBias = Math.cos((diff * Math.PI) / 180) // -1..1 curve
+      const wf = 1 + windBias * (windSpeed / 10) // smoother influence
 
       for (let y = 0; y < h; y++) {
-        const ny = (y - dy + h) % h // neighbor index (from -> center)
+        const ny = (y - dy + h) % h
         for (let x = 0; x < w; x++) {
           const nx = (x - dx + w) % w
           const center = idx(x, y, w)
           const neighbor = idx(nx, ny, w)
 
-          if (state[center] !== 0) continue // center must be unburnt
-          if (state[neighbor] !== 1) continue // neighbor must be burning
+          if (state[center] !== 0) continue
+          if (state[neighbor] !== 1) continue
 
-          const base = fireProb[center] // ML base
+          const base = fireProb[center]
           const ff = fuelFactor(fuel[center])
-          const sf = slopeFactor(slope[neighbor]) // uphill from neighbor
-          let P = base * ff * sf * wf * hf
+          const sf = slopeFactor(slope[neighbor])
+
+          // 🎲 Add randomness for irregular/curved spread
+          const noise = 0.85 + rng() * 0.3 // [0.85..1.15]
+
+          let P = base * ff * sf * wf * hf * noise
           if (P > 1) P = 1
           if (rng() < P) next[center] = 1
         }
@@ -220,6 +218,7 @@ function simulateCA(params: {
 
   return frames
 }
+
 
 function stateColor(v: number): [number, number, number] {
   if (v === 0) return [34, 139, 34] // unburnt: green
@@ -296,7 +295,7 @@ export default function Page() {
 
   async function loadDefaultMap() {
     setStatus("Loading map…")
-    const { w, h, dem, fuel } = await loadImageGrid("/images/default-map.png", 192)
+    const { w, h, dem, fuel } = await loadImageGrid("/images/default-map.png", 200)
     setW(w)
     setH(h)
     setDem(dem)
@@ -340,7 +339,7 @@ export default function Page() {
       windDir,
       humidity,
       seed,
-      ignitePoints: [],
+      // ignitePoints: [],
     })
     setFrames(f)
     setCur(0)
