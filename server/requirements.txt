@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+python-multipart
+pandas
+xarray
+scipy
+netcdf4
+numpy
+folium
+faiss-cpu
+
+requests
