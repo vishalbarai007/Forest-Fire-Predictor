@@ -13,7 +13,7 @@ const navigation = [
   { name: "Home", href: "/", icon: Home },
   { name: "Dashboard", href: "/dashboard", icon: Map },
   { name: "Chat", href: "/chat", icon: Brain },
-  { name: "Upload & Predict", href: "/upload", icon: Upload },
+  { name: "Upload & Predict", href: "/predict", icon: Upload },
   // { name: "Upload & Predict", href: "/upload1", icon: Upload },
   // { name: "2D to 3D Convert", href: "/2d-to-3d", icon: Layers3 },
   // { name: "3D Visualization", href: "/3d", icon: Box },
