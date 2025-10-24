@@ -8,6 +8,7 @@ import {
   Zap,
   Map,
 } from "lucide-react";
+import { Navigation } from "@/components/navigation";
 
 // --- Constants ---
 const SEQ_LEN = 6;
@@ -333,6 +334,7 @@ const PredictPage: React.FC = () => {
   return (
     <div className="PREDICT min-h-screen bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900  p-6">
       <div className="max-w-7xl mx-auto">
+        <Navigation/>
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
           <div className="flex items-center gap-3 mb-3">
